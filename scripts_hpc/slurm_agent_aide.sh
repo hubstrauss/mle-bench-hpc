@@ -93,6 +93,10 @@ apptainer exec ${SIF_IMAGE} cat /home/validate_submission.sh > "${OVERLAY_DIR}/v
 sed -i "s|http://localhost:5000|${GRADING_SERVER}|g" "${OVERLAY_DIR}/validate_submission.sh"
 chmod +x "${OVERLAY_DIR}/validate_submission.sh"
 
+# Extract and modify additional_notes.txt (AIDE specific)
+apptainer exec ${SIF_IMAGE} cat /home/agent/additional_notes.txt > "${OVERLAY_DIR}/additional_notes.txt"
+sed -i "s|http://localhost:5000|${GRADING_SERVER}|g" "${OVERLAY_DIR}/additional_notes.txt"
+
 # =============================================================================
 # Apply AIDE patches (GPT-4.1/GPT-5 temperature support)
 # =============================================================================
@@ -172,6 +176,7 @@ apptainer exec --nv \
     --bind ${OVERLAY_DIR}/instructions.txt:/home/instructions.txt:ro \
     --bind ${OVERLAY_DIR}/instructions_obfuscated.txt:/home/instructions_obfuscated.txt:ro \
     --bind ${OVERLAY_DIR}/validate_submission.sh:/home/validate_submission.sh:ro \
+    --bind ${OVERLAY_DIR}/additional_notes.txt:/home/agent/additional_notes.txt:ro \
     --bind ${OVERLAY_DIR}/aide_backend/backend_openai.py:${PYTHON_SITE_PACKAGES}/aide/backend/backend_openai.py:ro \
     --bind ${OVERLAY_DIR}/aide_utils/config.yaml:${PYTHON_SITE_PACKAGES}/aide/utils/config.yaml:ro \
     ${SIF_IMAGE} \
